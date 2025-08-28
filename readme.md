@@ -16,10 +16,12 @@ Vibe coding can trade clarity for cleverness. That can hide:
 - Scans Python files using **regex + AST**
 - Applies two rule sets: `rules/secure_coding.yml` and `rules/vibe_patterns.yml`
 - Emits **Markdown** and **JSON** reports with line‑precise findings
+- I have included a vibe coded (bad_code.py) script and report.json
 
 
 ## Quickstart
 ```bash
+*** First run pip install -r requirements.txt ****
 # 1) Create venv
 python -m venv .venv && . .venv/bin/activate # Windows: .venv\Scripts\activate
 
@@ -30,7 +32,9 @@ pip install -e .
 
 # 3) Run scan
 vibecode scan . --out report.md --json report.json
-
+python -m vibecodesec scan {path} --out report.md --json report.md
 
 # Or without packaging
 python vibecode.py scan . --out report.md --json report.json
+or can use
+
