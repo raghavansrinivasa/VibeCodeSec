@@ -15,7 +15,7 @@ keywords = ["security", "lint", "static-analysis", "python", "vibe-coding"]
 
 
 [project.scripts]
-vibecode = "vibecodesec.utils:cli_entry"
+vibecodesec = "vibecodesec.__main__:cli_entry"
 
 
 [tool.vibecodesec]

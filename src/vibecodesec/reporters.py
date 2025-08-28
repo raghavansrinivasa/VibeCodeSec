@@ -7,7 +7,7 @@ from .scanner import Finding
 
 
 def _md_escape(text: str) -> str:
-    return text.replace("|", '\|')
+    return text.replace("|", r"\|")
 
 
 def generate_reports(findings: List[Finding], scores: Dict[str, int], stats: Dict[str, int], *, md_path: Path, json_path: Path | None) -> None:

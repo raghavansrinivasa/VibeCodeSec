@@ -1,6 +1,7 @@
 README.md
 pyproject.toml
 src/vibecodesec/__init__.py
+src/vibecodesec/__main__.py
 src/vibecodesec/reporters.py
 src/vibecodesec/scanner.py
 src/vibecodesec/utils.py
