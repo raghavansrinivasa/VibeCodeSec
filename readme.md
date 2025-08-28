@@ -34,3 +34,5 @@ vibecode scan . --out report.md --json report.json
 
 # Or without packaging
 python vibecode.py scan . --out report.md --json report.json
+or can use
+python -m vibecodesec scan {path} --out report.md --json report.md
