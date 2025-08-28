@@ -16,6 +16,7 @@ Vibe coding can trade clarity for cleverness. That can hide:
 - Scans Python files using **regex + AST**
 - Applies two rule sets: `rules/secure_coding.yml` and `rules/vibe_patterns.yml`
 - Emits **Markdown** and **JSON** reports with line‑precise findings
+- I have included a vibe coded (bad_code.py) script and report.json
 
 
 ## Quickstart
