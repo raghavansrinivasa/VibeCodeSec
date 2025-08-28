@@ -1,15 +1,13 @@
 from __future__ import annotations
 import ast
+import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, List, Optional, Tuple
+from typing import Dict, Iterable, List, Optional, Tuple
 import yaml  # PyYAML
 
 SAFE_DEFAULT_EXCLUDES = {".git", ".venv", "venv", "node_modules", "dist", "build", "__pycache__"}
-
-
-# ---------- Data models ----------
 
 @dataclass
 class Rule:
@@ -21,7 +19,6 @@ class Rule:
     example: Optional[str] = None
     check_tool: Optional[str] = None  # regex | ast | mixed
 
-
 @dataclass
 class Finding:
     rule_id: str
@@ -32,10 +29,7 @@ class Finding:
     message: str
 
 
-# ---------- File reading ----------
-
 def _read_text_safely(path: Path) -> str:
-    """Read text from a file with safe UTF-8 decoding and BOM tolerance."""
     with path.open("rb") as f:
         data = f.read()
     try:
@@ -45,10 +39,7 @@ def _read_text_safely(path: Path) -> str:
 
 
 # ---------- Rule loading ----------
-
 def load_rules(secure_path: Path, vibe_path: Path) -> Tuple[List[Rule], List[Rule]]:
-    """Load security and vibe rules from YAML files."""
-
     def load_one(p: Path, category: str) -> List[Rule]:
         text = _read_text_safely(p)
         raw = yaml.safe_load(text) or []
@@ -64,12 +55,10 @@ def load_rules(secure_path: Path, vibe_path: Path) -> Tuple[List[Rule], List[Rul
                 check_tool=item.get("check_tool", "regex"),
             ))
         return rules
-
     return load_one(secure_path, "SEC"), load_one(vibe_path, "VIBE")
 
 
 # ---------- Regex checks ----------
-
 def _regex_findings(py_text: str, file_path: Path, rules: Iterable[Rule]) -> List[Finding]:
     findings: List[Finding] = []
     for rule in rules:
@@ -78,7 +67,7 @@ def _regex_findings(py_text: str, file_path: Path, rules: Iterable[Rule]) -> Lis
         try:
             pattern = re.compile(rule.pattern, flags=re.MULTILINE)
         except re.error:
-            continue  # skip invalid regex
+            continue
         for m in pattern.finditer(py_text):
             line_no = py_text.count("\n", 0, m.start()) + 1
             findings.append(Finding(
@@ -92,8 +81,7 @@ def _regex_findings(py_text: str, file_path: Path, rules: Iterable[Rule]) -> Lis
     return findings
 
 
-# ---------- AST checks ----------
-
+# ---------- AST checks for Python ----------
 class AstVisitor(ast.NodeVisitor):
     def __init__(self, file_path: Path, rules: Iterable[Rule]):
         self.file_path = file_path
@@ -101,11 +89,10 @@ class AstVisitor(ast.NodeVisitor):
         self.findings: List[Finding] = []
 
     def _emit(self, rule_id: str, node: ast.AST, severity: str, category: str, message: str) -> None:
-        line = getattr(node, "lineno", 1) or 1
+        line = getattr(node, 'lineno', 1) or 1
         self.findings.append(Finding(rule_id, str(self.file_path), line, severity, category, message))
 
     def visit_Call(self, node: ast.Call) -> None:
-        # SEC: eval/exec/__import__
         if isinstance(node.func, ast.Name) and node.func.id in {"eval", "exec", "__import__"}:
             for r in self.rules:
                 if r.check_tool == "ast" and r.id in {"insecure-eval", "insecure-exec", "dynamic-import"}:
@@ -113,7 +100,6 @@ class AstVisitor(ast.NodeVisitor):
         self.generic_visit(node)
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
-        # VIBE: single-letter parameter names
         short_args = [arg.arg for arg in node.args.args if len(arg.arg) == 1]
         if short_args:
             for r in self.rules:
@@ -133,7 +119,6 @@ def _ast_findings(py_text: str, file_path: Path, rules: Iterable[Rule]) -> List[
 
 
 # ---------- Scanning orchestration ----------
-
 def _iter_py_files(root: Path, excludes: Iterable[str]) -> Iterable[Path]:
     root = root if root.is_dir() else root.parent
     exclude_set = set(excludes) | SAFE_DEFAULT_EXCLUDES
@@ -144,7 +129,6 @@ def _iter_py_files(root: Path, excludes: Iterable[str]) -> Iterable[Path]:
 
 
 def scan_path(target: Path, rules_sec: List[Rule], rules_vibe: List[Rule], excludes: Iterable[str] = ()):
-    """Scan a file or directory and return findings, scores, and stats."""
     files: List[Path] = []
     if target.is_dir():
         files = list(_iter_py_files(target, excludes))
@@ -161,7 +145,6 @@ def scan_path(target: Path, rules_sec: List[Rule], rules_vibe: List[Rule], exclu
         all_findings.extend(_ast_findings(text, f, rules_sec))
         all_findings.extend(_ast_findings(text, f, rules_vibe))
 
-    # scoring
     weights = {"LOW": 1, "MEDIUM": 3, "HIGH": 7}
     sec_score = 100
     vibe_score = 100
@@ -177,3 +160,36 @@ def scan_path(target: Path, rules_sec: List[Rule], rules_vibe: List[Rule], exclu
     stats = {"files": len(files), "findings": len(all_findings)}
     scores = {"security": sec_score, "vibe": vibe_score}
     return all_findings, scores, stats
+
+
+# ---------- Multi-language support ----------
+def scan_text_file(file_path: Path, lang: str):
+    """
+    Scan a non-Python file using regex rules.
+    lang: "javascript", "java", etc.
+    """
+    text = _read_text_safely(file_path)
+    # For simplicity, use some generic rules per language
+    # In practice, you can load language-specific YAML rules
+    example_rules = [
+        Rule(id="hardcoded-key", description="Hardcoded key detected", pattern=r'["\'].*secret.*["\']', severity="HIGH", category="SEC", check_tool="regex"),
+        Rule(id="todo-comment", description="TODO found", pattern=r"// TODO|# TODO", severity="LOW", category="VIBE", check_tool="regex")
+    ]
+    findings = _regex_findings(text, file_path, example_rules)
+
+    # Score: simple, same as Python
+    weights = {"LOW": 1, "MEDIUM": 3, "HIGH": 7}
+    sec_score = 100
+    vibe_score = 100
+    for fd in findings:
+        w = weights.get(fd.severity.upper(), 3)
+        if fd.category == "SEC":
+            sec_score -= w
+        else:
+            vibe_score -= w
+    sec_score = max(sec_score, 0)
+    vibe_score = max(vibe_score, 0)
+    stats = {"files": 1, "findings": len(findings)}
+    scores = {"security": sec_score, "vibe": vibe_score}
+
+    return findings, scores, stats

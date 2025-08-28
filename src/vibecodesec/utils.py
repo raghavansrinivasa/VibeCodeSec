@@ -3,6 +3,7 @@ import argparse
 from pathlib import Path
 from typing import List, Dict
 
+# Merge helpers
 def merge_scores(scores_list: List[Dict[str, int]]) -> Dict[str, int]:
     """Average scores across multiple targets."""
     if not scores_list:
@@ -20,12 +21,22 @@ def merge_stats(stats_list: List[Dict[str, int]]) -> Dict[str, int]:
         merged['findings'] += s.get('findings', 0)
     return merged
 
-def cli_entry() -> None:
-    """Console entrypoint for `vibecode`.
+# Determine language by file extension
+def detect_language(file_path: Path) -> str:
+    ext = file_path.suffix.lower()
+    if ext == ".py":
+        return "python"
+    elif ext in {".js", ".ts"}:
+        return "javascript"
+    elif ext == ".java":
+        return "java"
+    # Add more languages here
+    else:
+        return "unknown"
 
-    Safe: no eval/exec; arguments validated; paths resolved.
-    """
-    parser = argparse.ArgumentParser(prog="vibecode", description="Scan Python code for vibe+security issues")
+def cli_entry() -> None:
+    """Console entrypoint for `vibecode`."""
+    parser = argparse.ArgumentParser(prog="vibecode", description="Scan code for vibe+security issues")
     sub = parser.add_subparsers(dest="cmd", required=True)
 
     scan = sub.add_parser("scan", help="Scan a directory or file")
@@ -42,7 +53,7 @@ def cli_entry() -> None:
         from .scanner import load_rules, scan_path
         from .reporters import generate_reports
 
-        # Load rules once
+        # Load rules once (Python rules)
         rules_sec, rules_vibe = load_rules(
             Path(r"E:\VibeCodeSec\src\rules\secure_coding.yml"),
             Path(r"E:\VibeCodeSec\src\rules\vibe_patterns.yml")
@@ -52,19 +63,36 @@ def cli_entry() -> None:
         all_scores: list = []
         all_stats: list = []
 
-        # Iterate over all targets
         for target in args.targets:
             target_path = Path(target).resolve()
-            findings, scores, stats = scan_path(target_path, rules_sec, rules_vibe, excludes=args.exclude)
-            all_findings.extend(findings)
-            all_scores.append(scores)
-            all_stats.append(stats)
+            if target_path.is_dir():
+                # Scan recursively
+                for f in target_path.rglob("*"):
+                    if f.is_file() and f.suffix in {".py", ".js", ".ts", ".java"}:  # extendable
+                        lang = detect_language(f)
+                        if lang == "python":
+                            findings, scores, stats = scan_path(f, rules_sec, rules_vibe, excludes=args.exclude)
+                        else:
+                            # Placeholder: For other languages, use regex-based scanner
+                            from .scanner import scan_text_file
+                            findings, scores, stats = scan_text_file(f, lang)  # implement scan_text_file in scanner.py
+                        all_findings.extend(findings)
+                        all_scores.append(scores)
+                        all_stats.append(stats)
+            else:
+                lang = detect_language(target_path)
+                if lang == "python":
+                    findings, scores, stats = scan_path(target_path, rules_sec, rules_vibe, excludes=args.exclude)
+                else:
+                    from .scanner import scan_text_file
+                    findings, scores, stats = scan_text_file(target_path, lang)
+                all_findings.extend(findings)
+                all_scores.append(scores)
+                all_stats.append(stats)
 
-        # Merge scores and stats before generating report
         merged_scores = merge_scores(all_scores)
         merged_stats = merge_stats(all_stats)
 
-        # Generate report
         generate_reports(
             all_findings,
             merged_scores,
