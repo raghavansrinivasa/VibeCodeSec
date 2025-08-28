@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "vibecodesec"
+version = "0.1.0"
+description = "Detects vibe-coded patterns and secure-coding issues in Python"
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [{name = "Raghavan Srinivas", email = "raghavan@dispensed.com.au"}]
+license = {text = "MIT"}
+keywords = ["security", "lint", "static-analysis", "python", "vibe-coding"]
+
+
+[project.scripts]
+vibecode = "vibecodesec.utils:cli_entry"
+
+
+[tool.vibecodesec]
+exclude = [".git", ".venv", "venv", "node_modules", "dist", "build", "__pycache__"]
+max_line_len_for_oneliner = 120

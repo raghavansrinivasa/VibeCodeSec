@@ -1,0 +1,34 @@
+- id: one-liner-complex
+  description: "Overly long single lines reduce readability and auditability; split statements."
+  pattern: '(?m)^[^\n]{121,}$'
+  severity: MEDIUM
+  example: "result = do_this(x).and_then(y).finally(z) if cond else fallback(a).maybe(b).otherwise(c)"
+  check_tool: regex
+
+- id: chained-methods
+  description: "Deeply chained calls hide errors; consider intermediate variables and try/except."
+  pattern: '\.[A-Za-z_][A-Za-z0-9_]*\(\)\.[A-Za-z_][A-Za-z0-9_]*\(\)'
+  severity: MEDIUM
+  example: "conn.open().query(sql).fetchall()"
+  check_tool: regex
+
+- id: ambiguous-variable-names
+  description: "Single ambiguous variables (l, O, I) hinder code review; choose descriptive names."
+  pattern: '(?m)\b[lOI]\b'
+  severity: LOW
+  example: "for l in data: pass"
+  check_tool: regex
+
+- id: unicode-homoglyph
+  description: "Potential Unicode homoglyph usage (obfuscation risk)."
+  pattern: '[\u0430\u0456\u0131\u2170\u2113]'
+  severity: HIGH
+  example: "а = 1  # Cyrillic a"
+  check_tool: regex
+
+- id: single-letter-args
+  description: "Function parameters with single letters reduce clarity; rename to meaningful names."
+  pattern: ""
+  severity: LOW
+  example: "def f(a, b, c): return a+b+c"
+  check_tool: ast

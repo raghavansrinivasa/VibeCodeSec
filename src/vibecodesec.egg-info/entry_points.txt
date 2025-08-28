@@ -1,0 +1,2 @@
+[console_scripts]
+vibecode = vibecodesec.utils:cli_entry

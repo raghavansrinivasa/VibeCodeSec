@@ -1,0 +1,7 @@
+pyyaml
+bandit
+flake8
+rich
+black
+isort
+pre-commit

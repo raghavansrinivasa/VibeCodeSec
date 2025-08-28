@@ -1,0 +1,41 @@
+- id: insecure-eval
+  description: "Use of eval() is unsafe and can lead to RCE. Prefer ast.literal_eval for data or explicit parsing."
+  pattern: '(?m)\beval\s*\('
+  severity: HIGH
+  example: "result = eval(user_input)"
+  check_tool: ast
+
+- id: insecure-exec
+  description: "Use of exec() can execute arbitrary code. Avoid or strictly confine."
+  pattern: '(?m)\bexec\s*\('
+  severity: HIGH
+  example: "exec(code_str)"
+  check_tool: ast
+
+- id: dynamic-import
+  description: "Dynamic imports via __import__ can mask malicious modules. Prefer static imports."
+  pattern: '(?m)\b__import__\s*\('
+  severity: HIGH
+  example: "m = __import__(modname)"
+  check_tool: ast
+
+- id: hardcoded-secrets
+  description: "Possible hardcoded secret detected. Store in environment or secret manager."
+  pattern: pattern:'(?i)(password|passwd|token|api(_|)key|secret)\s*=\s*[\'"][A-Za-z0-9_\-\.=]{12,}[\'"]'
+  severity: HIGH
+  example: "API_KEY = 'sk_live_1234567890abcdef'"
+  check_tool: regex
+
+- id: regex-validation-only
+  description: "Avoid relying solely on regex for input validation; add parsing and type checks."
+  pattern: '(?m)\bre\s*\.\s*(match|fullmatch)\s*\('
+  severity: MEDIUM
+  example: "if re.match(r'^\\d+$', s): pass"
+  check_tool: regex
+
+- id: magic-attr-access
+  description: "Access to __dict__ or __class__ may leak internals or enable tampering."
+  pattern: "(?m)__dict__|__class__"
+  severity: HIGH
+  example: "obj.__dict__['admin']=True"
+  check_tool: regex

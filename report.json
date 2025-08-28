@@ -1,0 +1,11 @@
+{
+  "scores": {
+    "security": 100,
+    "vibe": 100
+  },
+  "stats": {
+    "files": 1,
+    "findings": 0
+  },
+  "findings": []
+}
