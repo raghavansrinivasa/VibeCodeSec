@@ -1,5 +1,5 @@
 # VibeCodeSec Report
-SecurityScore: 51/100 | VibeScore: 72/100 | Files: 7 | Findings: 17
+SecurityScore: 51/100 | VibeScore: 78/100 | Files: 7 | Findings: 15
 
 ## Findings
 | Level | Type | Rule | File:Line | Message |
@@ -17,7 +17,5 @@ SecurityScore: 51/100 | VibeScore: 72/100 | Files: 7 | Findings: 17
 | MEDIUM | VIBE | `one-liner-complex` | `E:\VibeCodeSec\src\vibecodesec\reporters.py:13` | Overly long single lines reduce readability and auditability; split statements. |
 | MEDIUM | VIBE | `one-liner-complex` | `E:\VibeCodeSec\src\vibecodesec\reporters.py:16` | Overly long single lines reduce readability and auditability; split statements. |
 | MEDIUM | VIBE | `one-liner-complex` | `E:\VibeCodeSec\src\vibecodesec\reporters.py:26` | Overly long single lines reduce readability and auditability; split statements. |
-| MEDIUM | VIBE | `one-liner-complex` | `E:\VibeCodeSec\src\vibecodesec\scanner.py:116` | Overly long single lines reduce readability and auditability; split statements. |
-| LOW | VIBE | `single-letter-args` | `E:\VibeCodeSec\src\vibecodesec\scanner.py:45` | Single-letter parameters: p |
-| MEDIUM | VIBE | `one-liner-complex` | `E:\VibeCodeSec\src\vibecodesec\utils.py:27` | Overly long single lines reduce readability and auditability; split statements. |
-| MEDIUM | VIBE | `one-liner-complex` | `E:\VibeCodeSec\src\vibecodesec\utils.py:29` | Overly long single lines reduce readability and auditability; split statements. |
+| MEDIUM | VIBE | `one-liner-complex` | `E:\VibeCodeSec\src\vibecodesec\scanner.py:121` | Overly long single lines reduce readability and auditability; split statements. |
+| LOW | VIBE | `single-letter-args` | `E:\VibeCodeSec\src\vibecodesec\scanner.py:52` | Single-letter parameters: p |

@@ -1,11 +1,11 @@
 {
   "scores": {
     "security": 51,
-    "vibe": 72
+    "vibe": 78
   },
   "stats": {
     "files": 7,
-    "findings": 17
+    "findings": 15
   },
   "findings": [
     {
@@ -115,7 +115,7 @@
     {
       "rule_id": "one-liner-complex",
       "file": "E:\\VibeCodeSec\\src\\vibecodesec\\scanner.py",
-      "line": 116,
+      "line": 121,
       "severity": "MEDIUM",
       "category": "VIBE",
       "message": "Overly long single lines reduce readability and auditability; split statements."
@@ -123,26 +123,10 @@
     {
       "rule_id": "single-letter-args",
       "file": "E:\\VibeCodeSec\\src\\vibecodesec\\scanner.py",
-      "line": 45,
+      "line": 52,
       "severity": "LOW",
       "category": "VIBE",
       "message": "Single-letter parameters: p"
-    },
-    {
-      "rule_id": "one-liner-complex",
-      "file": "E:\\VibeCodeSec\\src\\vibecodesec\\utils.py",
-      "line": 27,
-      "severity": "MEDIUM",
-      "category": "VIBE",
-      "message": "Overly long single lines reduce readability and auditability; split statements."
-    },
-    {
-      "rule_id": "one-liner-complex",
-      "file": "E:\\VibeCodeSec\\src\\vibecodesec\\utils.py",
-      "line": 29,
-      "severity": "MEDIUM",
-      "category": "VIBE",
-      "message": "Overly long single lines reduce readability and auditability; split statements."
     }
   ]
 }

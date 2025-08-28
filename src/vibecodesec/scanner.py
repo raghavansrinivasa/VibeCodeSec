@@ -1,14 +1,15 @@
 from __future__ import annotations
 import ast
-import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Tuple
-
+from typing import Iterable, List, Optional, Tuple
 import yaml  # PyYAML
 
 SAFE_DEFAULT_EXCLUDES = {".git", ".venv", "venv", "node_modules", "dist", "build", "__pycache__"}
+
+
+# ---------- Data models ----------
 
 @dataclass
 class Rule:
@@ -20,6 +21,7 @@ class Rule:
     example: Optional[str] = None
     check_tool: Optional[str] = None  # regex | ast | mixed
 
+
 @dataclass
 class Finding:
     rule_id: str
@@ -30,18 +32,23 @@ class Finding:
     message: str
 
 
+# ---------- File reading ----------
+
 def _read_text_safely(path: Path) -> str:
-    # Robust UTF-8 reading with BOM tolerance; no network or exec
+    """Read text from a file with safe UTF-8 decoding and BOM tolerance."""
     with path.open("rb") as f:
         data = f.read()
     try:
         return data.decode("utf-8")
     except UnicodeDecodeError:
-        # Fallback: replace errors; we log nothing to avoid leaking data
         return data.decode("utf-8", errors="replace")
 
 
+# ---------- Rule loading ----------
+
 def load_rules(secure_path: Path, vibe_path: Path) -> Tuple[List[Rule], List[Rule]]:
+    """Load security and vibe rules from YAML files."""
+
     def load_one(p: Path, category: str) -> List[Rule]:
         text = _read_text_safely(p)
         raw = yaml.safe_load(text) or []
@@ -71,10 +78,8 @@ def _regex_findings(py_text: str, file_path: Path, rules: Iterable[Rule]) -> Lis
         try:
             pattern = re.compile(rule.pattern, flags=re.MULTILINE)
         except re.error:
-            # Skip invalid regex patterns to avoid crashing the scan
-            continue
+            continue  # skip invalid regex
         for m in pattern.finditer(py_text):
-            # Get line number by counting newlines up to match start
             line_no = py_text.count("\n", 0, m.start()) + 1
             findings.append(Finding(
                 rule_id=rule.id,
@@ -87,7 +92,7 @@ def _regex_findings(py_text: str, file_path: Path, rules: Iterable[Rule]) -> Lis
     return findings
 
 
-# ---------- AST checks (safe, no exec) ----------
+# ---------- AST checks ----------
 
 class AstVisitor(ast.NodeVisitor):
     def __init__(self, file_path: Path, rules: Iterable[Rule]):
@@ -96,7 +101,7 @@ class AstVisitor(ast.NodeVisitor):
         self.findings: List[Finding] = []
 
     def _emit(self, rule_id: str, node: ast.AST, severity: str, category: str, message: str) -> None:
-        line = getattr(node, 'lineno', 1) or 1
+        line = getattr(node, "lineno", 1) or 1
         self.findings.append(Finding(rule_id, str(self.file_path), line, severity, category, message))
 
     def visit_Call(self, node: ast.Call) -> None:
@@ -108,7 +113,7 @@ class AstVisitor(ast.NodeVisitor):
         self.generic_visit(node)
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
-        # VIBE: overly short args (single-letter) → readability risk
+        # VIBE: single-letter parameter names
         short_args = [arg.arg for arg in node.args.args if len(arg.arg) == 1]
         if short_args:
             for r in self.rules:
@@ -139,6 +144,7 @@ def _iter_py_files(root: Path, excludes: Iterable[str]) -> Iterable[Path]:
 
 
 def scan_path(target: Path, rules_sec: List[Rule], rules_vibe: List[Rule], excludes: Iterable[str] = ()):
+    """Scan a file or directory and return findings, scores, and stats."""
     files: List[Path] = []
     if target.is_dir():
         files = list(_iter_py_files(target, excludes))
@@ -155,7 +161,7 @@ def scan_path(target: Path, rules_sec: List[Rule], rules_vibe: List[Rule], exclu
         all_findings.extend(_ast_findings(text, f, rules_sec))
         all_findings.extend(_ast_findings(text, f, rules_vibe))
 
-    # Simple scoring: start at 100, subtract per finding weighted by severity
+    # scoring
     weights = {"LOW": 1, "MEDIUM": 3, "HIGH": 7}
     sec_score = 100
     vibe_score = 100

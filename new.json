@@ -1,0 +1,132 @@
+{
+  "scores": {
+    "security": 16,
+    "vibe": 91
+  },
+  "stats": {
+    "files": 2,
+    "findings": 15
+  },
+  "findings": [
+    {
+      "rule_id": "ambiguous-variable-names",
+      "file": "E:\\code\\bad_code.py",
+      "line": 11,
+      "severity": "LOW",
+      "category": "VIBE",
+      "message": "Single ambiguous variables (l, O, I) hinder code review; choose descriptive names."
+    },
+    {
+      "rule_id": "unicode-homoglyph",
+      "file": "E:\\code\\bad_code.py",
+      "line": 15,
+      "severity": "HIGH",
+      "category": "VIBE",
+      "message": "Potential Unicode homoglyph usage (obfuscation risk)."
+    },
+    {
+      "rule_id": "insecure-eval",
+      "file": "E:\\code\\bad_code.py",
+      "line": 7,
+      "severity": "HIGH",
+      "category": "SEC",
+      "message": "Use of eval() is unsafe and can lead to RCE. Prefer ast.literal_eval for data or explicit parsing."
+    },
+    {
+      "rule_id": "insecure-exec",
+      "file": "E:\\code\\bad_code.py",
+      "line": 7,
+      "severity": "HIGH",
+      "category": "SEC",
+      "message": "Use of exec() can execute arbitrary code. Avoid or strictly confine."
+    },
+    {
+      "rule_id": "dynamic-import",
+      "file": "E:\\code\\bad_code.py",
+      "line": 7,
+      "severity": "HIGH",
+      "category": "SEC",
+      "message": "Dynamic imports via __import__ can mask malicious modules. Prefer static imports."
+    },
+    {
+      "rule_id": "insecure-eval",
+      "file": "E:\\code\\bad_code.py",
+      "line": 8,
+      "severity": "HIGH",
+      "category": "SEC",
+      "message": "Use of eval() is unsafe and can lead to RCE. Prefer ast.literal_eval for data or explicit parsing."
+    },
+    {
+      "rule_id": "insecure-exec",
+      "file": "E:\\code\\bad_code.py",
+      "line": 8,
+      "severity": "HIGH",
+      "category": "SEC",
+      "message": "Use of exec() can execute arbitrary code. Avoid or strictly confine."
+    },
+    {
+      "rule_id": "dynamic-import",
+      "file": "E:\\code\\bad_code.py",
+      "line": 8,
+      "severity": "HIGH",
+      "category": "SEC",
+      "message": "Dynamic imports via __import__ can mask malicious modules. Prefer static imports."
+    },
+    {
+      "rule_id": "single-letter-args",
+      "file": "E:\\code\\bad_code.py",
+      "line": 5,
+      "severity": "LOW",
+      "category": "VIBE",
+      "message": "Single-letter parameters: a, b, c"
+    },
+    {
+      "rule_id": "insecure-eval",
+      "file": "E:\\code\\good_code.py",
+      "line": 6,
+      "severity": "HIGH",
+      "category": "SEC",
+      "message": "Use of eval() is unsafe and can lead to RCE. Prefer ast.literal_eval for data or explicit parsing."
+    },
+    {
+      "rule_id": "insecure-exec",
+      "file": "E:\\code\\good_code.py",
+      "line": 6,
+      "severity": "HIGH",
+      "category": "SEC",
+      "message": "Use of exec() can execute arbitrary code. Avoid or strictly confine."
+    },
+    {
+      "rule_id": "dynamic-import",
+      "file": "E:\\code\\good_code.py",
+      "line": 6,
+      "severity": "HIGH",
+      "category": "SEC",
+      "message": "Dynamic imports via __import__ can mask malicious modules. Prefer static imports."
+    },
+    {
+      "rule_id": "insecure-eval",
+      "file": "E:\\code\\good_code.py",
+      "line": 7,
+      "severity": "HIGH",
+      "category": "SEC",
+      "message": "Use of eval() is unsafe and can lead to RCE. Prefer ast.literal_eval for data or explicit parsing."
+    },
+    {
+      "rule_id": "insecure-exec",
+      "file": "E:\\code\\good_code.py",
+      "line": 7,
+      "severity": "HIGH",
+      "category": "SEC",
+      "message": "Use of exec() can execute arbitrary code. Avoid or strictly confine."
+    },
+    {
+      "rule_id": "dynamic-import",
+      "file": "E:\\code\\good_code.py",
+      "line": 7,
+      "severity": "HIGH",
+      "category": "SEC",
+      "message": "Dynamic imports via __import__ can mask malicious modules. Prefer static imports."
+    }
+  ]
+}
