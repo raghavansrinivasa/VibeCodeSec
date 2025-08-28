@@ -20,6 +20,7 @@ Vibe coding can trade clarity for cleverness. That can hide:
 
 ## Quickstart
 ```bash
+*** First run pip install -r requirements.txt ****
 # 1) Create venv
 python -m venv .venv && . .venv/bin/activate # Windows: .venv\Scripts\activate
 
